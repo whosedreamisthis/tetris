@@ -54,12 +54,61 @@ public class TetrisBlock : MonoBehaviour
             {
                 transform.position -= new Vector3(0, -1, 0);
                 AddToGrid();
-                //CheckForLines();
+                CheckForLines();
                 this.enabled = false;
                 FindObjectOfType<BlockSpawner>().NewTetromino();
             }
             previousTime = Time.time;
         }
+    }
+
+    void CheckForLines()
+    {
+        for (int i = height - 1; i >= 0; i--)
+        {
+            if (HasLine(i))
+            {
+                DeleteLine(i);
+                RowDown(i);
+            }
+        }
+    }
+
+    void RowDown(int i)
+    {
+        for (int y = i; y < height; y++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                if (grid[j, y] != null)
+                {
+                    grid[j, y - 1] = grid[j, y];
+                    grid[j, y] = null;
+                    grid[j, y - 1].transform.position -= new Vector3(0, 1, 0);
+                }
+            }
+        }
+    }
+    void DeleteLine(int i)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            Destroy(grid[j, i].gameObject);
+            grid[j, i] = null;
+        }
+    }
+
+    bool HasLine(int i)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            //Debug.Log(i + " " + j);
+            if (grid[j, i] == null)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     void AddToGrid()
